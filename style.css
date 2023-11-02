@@ -22,3 +22,23 @@ body > h1 {
     grid-template-columns: repeat(2,200px);
     gap: 10px;
 }
+.gamePanel {
+    display: grid;
+    grid-template-columns: repeat(3,1fr);
+    gap: 10px;
+}
+
+.gamePanel > * {
+    border: 0px;
+    outline: 0px;
+    height: 100px;
+    width: 100px;
+}
+
+.gamePanel >*:hover{
+    border: 2px solid;
+}
+
+.cell {
+    font-size: 24px;
+}
