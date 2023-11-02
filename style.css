@@ -1,0 +1,24 @@
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+body {
+    height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: 100px 1fr 200px 200px;
+    justify-items: center;
+    align-items: center;
+}
+
+body > h1 {
+    justify-self: start;
+}
+
+.name {
+    display: grid;
+    grid-template-columns: repeat(2,200px);
+    gap: 10px;
+}
