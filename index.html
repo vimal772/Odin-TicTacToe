@@ -8,16 +8,25 @@
 </head>
 <body>
     <h1>TIC TAC TOE</h1>
+    <div class="scoreBoard">
+        <div class="containerX">
+            <h3>X SCORE</h3>
+            <p class="X_score">0</p>
+        </div>
+        <div class="containerO">
+            <h3>O SCORE</h3>
+            <p class="O_score">0</p>
+        </div>
+    </div>
     <div class="gamePanel" id="gamePanel"></div>
     <div class="name">
-        <input type="text" class="playerOne" placeholder="Player One Name" required>
-        <input type="text" class="playerTwo" placeholder="Player Two Name" required>
         <button class="start">START</button>
-        <button class="reStart">RESTART</button>
+        <button class="reStart">RE START</button>
+        <button class="close">CLOSE</button>
     </div>
-    <div class="displayMsg">
+    <dialog class="displayMsg">
         <p class="para"></p>
-    </div>
+    </dialog>
     <script src="script.js"></script>
 </body>
 </html>

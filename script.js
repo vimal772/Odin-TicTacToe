@@ -1,5 +1,6 @@
 const start = document.querySelector('.start');
 const reStart = document.querySelector('.reStart');
+const closeBtn = document.querySelector('.close');
 
 start.addEventListener('click', () => {
     Game.start();
@@ -9,6 +10,9 @@ reStart.addEventListener('click',()=> {
     Game.gameRestart();
 });
 
+closeBtn.addEventListener('click',()=> {
+    Game.reStart();
+})
 const gameBoard = (() => {
     const cells = 9;
 
@@ -30,19 +34,12 @@ const gameBoard = (() => {
         //hover
         let buttons = document.querySelectorAll('.cell');
             buttons.forEach((btn)=>{
-                btn.addEventListener('click', Game.handleClick );
+                btn.addEventListener('click', Game.handleClick);
             })
-    }
-
-    function reStart() {
-        document.querySelectorAll('.cell').forEach((btn) => {
-            div.removeChild(btn);
-        });
     } 
 
     return { 
         createBoard,
-        reStart,
     };
 })();
     
@@ -54,8 +51,8 @@ const Game = (() => {
     let spaces = ["","","","","","","","",""];
     let called = false;
     players = [
-        createPlayer(document.querySelector('.playerOne').value, "X"),
-        createPlayer(document.querySelector('.playerTwo').value, 'O'),
+        createPlayer('Player One', "X"),
+        createPlayer('Player Two',"O"),
     ]
     const start = () => {
         if(called){ return };
@@ -63,6 +60,23 @@ const Game = (() => {
         gameOver = false;
         gameBoard.createBoard()
         called = true;
+    }
+
+    const displayScore = (sign) => {
+        const para1 = document.querySelector('.X_score');
+        const para2 = document.querySelector('.O_score');
+        const div = document.querySelector(`.container${sign}`);
+
+        if(sign == "X"){
+            para1.textContent = (parseInt(para1.textContent)+1).toString();
+            div.appendChild(para1)
+        }else if(sign == 'O'){
+            para2.textContent = (parseInt(para2.textContent)+1).toString();
+            div.appendChild(para2)
+        }else{
+            return;
+        }
+
     }
 
     const switchPlayerTurn = () => {
@@ -75,6 +89,7 @@ const Game = (() => {
 
         let index= event.target.id;
         if(btnHasText()){
+            document.querySelector(`#${index}`).classList.add('active')
             document.querySelector(`#${index}`).textContent = players[currentPlayer].mark;
             spaces[indexArr] = players[currentPlayer].mark;
             checkWinner();
@@ -117,10 +132,6 @@ const Game = (() => {
 
             if(cellsFull){
                 appendMsg("TIE");
-                // setTimeout(
-                //     gameRestart,
-                //     1000
-                // );
             }
         }
 
@@ -134,6 +145,25 @@ const Game = (() => {
         
         para.textContent = `${msg}`
         div.appendChild(para);
+        div.showModal();
+
+        if(msg === "TIE"){
+            return;
+        }else if(msg === "X Has Won"){
+            displayScore(players[currentPlayer].mark)
+        }else{
+            displayScore(players[currentPlayer].mark)
+        }
+
+        setTimeout(
+            closeDiv,
+            2500
+        );
+
+        function closeDiv() {
+            div.close();
+            gameRestart();
+        } 
     }
 
     function gameRestart(){
@@ -141,14 +171,29 @@ const Game = (() => {
         gameOver = false
         spaces.fill("");
         document.querySelectorAll(`.cell`).forEach((cell) => {
+            cell.classList.remove('active');
             cell.textContent = "";
         })
     }
+
+
+    function reStart() {
+        const div = document.querySelector('#gamePanel')
+        document.querySelectorAll('.cell').forEach((btn) => {
+            div.removeChild(btn);
+            called = false;
+            currentPlayer = 0;
+            gameOver = false;
+            spaces.fill("");
+        });
+    }
+
 
     return {
         start,
         handleClick,
         gameRestart,
+        reStart,
     }
 })()
 

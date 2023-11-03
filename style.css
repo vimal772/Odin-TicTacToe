@@ -8,7 +8,7 @@ body {
     height: 100vh;
     display: grid;
     grid-template-columns: 1fr;
-    grid-template-rows: 100px 1fr 200px 200px;
+    grid-template-rows: 100px 200px 1fr 200px 200px;
     justify-items: center;
     align-items: center;
 }
@@ -19,8 +19,21 @@ body > h1 {
 
 .name {
     display: grid;
-    grid-template-columns: repeat(2,200px);
+    grid-template-columns: 1fr;
     gap: 10px;
+}
+
+.name > button {
+    height: 30px;
+    width: 200px;
+    border: 0;
+    background-color: white;
+    border-radius: 10px;
+    font-size: 1.2rem;
+}
+
+.name > button:hover {
+    background-color: #dbd8d8;
 }
 .gamePanel {
     display: grid;
@@ -30,15 +43,52 @@ body > h1 {
 
 .gamePanel > * {
     border: 0px;
+    border-radius: 10px;
     outline: 0px;
     height: 100px;
     width: 100px;
 }
 
 .gamePanel >*:hover{
-    border: 2px solid;
+    border: 2px solid #b6b1b1;
 }
 
 .cell {
-    font-size: 24px;
+    font-size: 2rem;
+}
+
+.displayMsg {
+    position: absolute; 
+    left: 0; 
+    right: 0; 
+    margin:auto;
+    top: -100px; 
+    width: 500px;
+    height: 400px;
+
+    text-align: center;
+    line-height: 390px;
+    border: 0px;
+    border-radius: 10px;
+    box-shadow: 0px 0px 1em rgb(13, 13, 13) ;
+    outline: none;
+
+    font-size: 2rem;
+}
+
+.displayMsg::backdrop {
+    background-color: black;
+    opacity: .4;
+}
+
+.scoreBoard {
+    display: flex;
+    gap: 10px;
+}
+
+.comntainerX,
+.comntainerO {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }
