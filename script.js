@@ -1,75 +1,22 @@
 const start = document.querySelector('.start');
 const reStart = document.querySelector('.reStart');
+//     function appendMsg() {
+//         const div = document.querySelector('.displayMsg');
+//         const para = document.createElement('p');
 
-start.addEventListener('click',()=> {
-    const player1 = document.querySelector('.playerOne').value;
-    const player2 = document.querySelector('.playerTwo').value;
+//         para.textContent = "Player has won";
+//         div.appendChild(para);
+//     }
 
-    const game = gameController(player1,player2);
-    game.createBoard();
-    let buttons = document.querySelectorAll('.cell');
-    buttons.forEach((btn)=>{
-        btn.addEventListener('click',()=> {
-            if(btnHasText()){
-                btn.innerText = game.getActivePlayer().sign;
-                game.switchPlayerTurn();
-                game.checkLogic();
-            }else {
-                return;
-            }
-            function btnHasText() {
-                return btn.innerText === "";
-            }
-        })
-    })
-});
-
+start.addEventListener('click', () => {
+    Game.start();
+})
 
 reStart.addEventListener('click',()=> {
-        const game = gameController("","");
-        game.newRound();
-        // game.defaultPlayer();
+    Game.gameRestart();
 });
 
-function gameController(playerOne = "Player One",playerTwo = "Player Two",sign1 = "X",sign2 = "O") {
-    const { createBoard,reStart } =  gameBoard();
-    const players = [
-        {
-            name: playerOne,
-            token: 1,
-            sign : sign1
-        },
-        {
-            name : playerTwo,
-            token : 2,
-            sign : sign2
-        }
-    ] 
-
-    let activePlayer = players[0];
-
-    const switchPlayerTurn = () => {
-       activePlayer = activePlayer === players[0] ? players[1]: players[0];
-    }
-
-    const getActivePlayer = () => activePlayer;
-
-    // const defaultPlayer = () => {
-    //     activePlayer = players[0];
-    // }
-
-    function newRound() {
-        document.querySelectorAll('.cell').forEach((btn)=> {
-            btn.textContent = "";
-        })
-    }
-
-    const { checkLogic,appendMsg } = gameLogic();    
-    return { switchPlayerTurn,createBoard,getActivePlayer,reStart,newRound,checkLogic,appendMsg }
-
-};
-
-function gameBoard(){
+const gameBoard = (() => {
     const cells = 9;
 
     function createBoard(){
@@ -83,8 +30,15 @@ function gameBoard(){
     function render(index) {
         const btn = document.createElement('button');
         btn.classList.add('cell');
-        btn.classList.add(`cell-${index}`);
-        div.appendChild(btn);  
+        btn.setAttribute('id',`cell-${index}`);
+        div.appendChild(btn);
+        
+        
+        //hover
+        let buttons = document.querySelectorAll('.cell');
+            buttons.forEach((btn)=>{
+                btn.addEventListener('click', Game.handleClick );
+            })
     }
 
     function reStart() {
@@ -93,41 +47,110 @@ function gameBoard(){
         });
     } 
 
-    return { createBoard,reStart };
-}
+    return { 
+        createBoard,
+        reStart,
+    };
+})();
+    
 
+const Game = (() => {
+    let players = [];
+    let currentPlayer;
+    let gameOver = false;
+    let spaces = ["","","","","","","","",""];
+    const start = () => {
+        players = [
+            createPlayer(document.querySelector('.playerOne').value, "X"),
+            createPlayer(document.querySelector('.playerTwo').value, 'O'),
+        ]
+        currentPlayer = 0;
+        gameOver = false;
+        gameBoard.createBoard()
+    }
 
-function gameLogic() {
-    const winningCombos = [
-        [0,1,2],
-        [3,4,5],
-        [6,7,8],
-        [0,4,8],
-        [2,4,6],
-        [0,3,6],
-        [1,4,7],
-        [2,5,8]
-    ];
-    let isGameWon = false;
-    function checkLogic() {
-        if(isGameWon){ return };
-        const buttons = document.querySelectorAll('.cell');
-        for (const combo of winningCombos) {
-            let [a,b,c] = combo;
-            if(buttons[a].innerText && (buttons[a].innerText == buttons[b].innerText) && (buttons[a].innerText == buttons[c].innerText)) {
-                appendMsg();
-                isGameWon = true;
-            }
+    const switchPlayerTurn = () => {
+        currentPlayer = currentPlayer === 0 ? 1:0; 
+    }
+
+    function handleClick(event) {
+        if(gameOver) {return}
+        let indexArr = event.target.id.split('-')[1];
+        // console.log(index);
+
+        let index= event.target.id;
+        if(btnHasText()){
+            document.querySelector(`#${index}`).textContent = players[currentPlayer].mark;
+            spaces[indexArr] = players[currentPlayer].mark;
+            switchPlayerTurn();
+            checkWinner();
+        }else {
+            return;
+        }
+        function btnHasText() {
+            return event.target.innerText === "";
         }
     }
+    function checkWinner(){
+        const winningCombos = [
+            [0,1,2],
+            [3,4,5],
+            [6,7,8],
+            [0,4,8],
+            [2,4,6],
+            [0,3,6],
+            [1,4,7],
+            [2,5,8]
+        ];
 
-    function appendMsg() {
-        const div = document.querySelector('.displayMsg');
-        const para = document.createElement('p');
+        function checkWinnerCombo() {
+            if(gameOver){ return };
+            for (const combo of winningCombos) {
+                let [a,b,c] = combo;
+                if(spaces[a] && (spaces[a] == spaces[b]) && (spaces[a] == spaces[c])) {
+                    // appendMsg();
+                    console.log('win');
+                    gameOver = true;
+                }
+            }
+        }
 
-        para.textContent = "Player has won";
-        div.appendChild(para);
+        function chechForTie(){
+            if(gameOver){ return }
+            let cellsFull = spaces.every((space)=> {
+                return space !== "";
+            })
+
+            if(cellsFull){
+                console.log("Tie");
+                setTimeout(
+                    gameRestart,
+                    5000
+                );
+            }
+        }
+
+        checkWinnerCombo();
+        chechForTie();
     }
 
-    return { checkLogic,appendMsg };
+    function gameRestart(){
+        spaces.fill("");
+        document.querySelectorAll(`.cell`).forEach((cell) => {
+            cell.textContent = "";
+        })
+    }
+
+    return {
+        start,
+        handleClick,
+        gameRestart,
+    }
+})()
+
+function createPlayer(name,mark){
+    return {
+        name,
+        mark
+    }
 }
