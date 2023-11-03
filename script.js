@@ -1,12 +1,5 @@
 const start = document.querySelector('.start');
 const reStart = document.querySelector('.reStart');
-//     function appendMsg() {
-//         const div = document.querySelector('.displayMsg');
-//         const para = document.createElement('p');
-
-//         para.textContent = "Player has won";
-//         div.appendChild(para);
-//     }
 
 start.addEventListener('click', () => {
     Game.start();
@@ -59,14 +52,17 @@ const Game = (() => {
     let currentPlayer;
     let gameOver = false;
     let spaces = ["","","","","","","","",""];
+    let called = false;
+    players = [
+        createPlayer(document.querySelector('.playerOne').value, "X"),
+        createPlayer(document.querySelector('.playerTwo').value, 'O'),
+    ]
     const start = () => {
-        players = [
-            createPlayer(document.querySelector('.playerOne').value, "X"),
-            createPlayer(document.querySelector('.playerTwo').value, 'O'),
-        ]
+        if(called){ return };
         currentPlayer = 0;
         gameOver = false;
         gameBoard.createBoard()
+        called = true;
     }
 
     const switchPlayerTurn = () => {
@@ -76,14 +72,13 @@ const Game = (() => {
     function handleClick(event) {
         if(gameOver) {return}
         let indexArr = event.target.id.split('-')[1];
-        // console.log(index);
 
         let index= event.target.id;
         if(btnHasText()){
             document.querySelector(`#${index}`).textContent = players[currentPlayer].mark;
             spaces[indexArr] = players[currentPlayer].mark;
-            switchPlayerTurn();
             checkWinner();
+            switchPlayerTurn();
         }else {
             return;
         }
@@ -108,8 +103,7 @@ const Game = (() => {
             for (const combo of winningCombos) {
                 let [a,b,c] = combo;
                 if(spaces[a] && (spaces[a] == spaces[b]) && (spaces[a] == spaces[c])) {
-                    // appendMsg();
-                    console.log('win');
+                    appendMsg();
                     gameOver = true;
                 }
             }
@@ -122,11 +116,11 @@ const Game = (() => {
             })
 
             if(cellsFull){
-                console.log("Tie");
-                setTimeout(
-                    gameRestart,
-                    5000
-                );
+                appendMsg("TIE");
+                // setTimeout(
+                //     gameRestart,
+                //     1000
+                // );
             }
         }
 
@@ -134,7 +128,17 @@ const Game = (() => {
         chechForTie();
     }
 
+    function appendMsg(msg=`${players[currentPlayer].mark} Has Won`) {
+        const div = document.querySelector('.displayMsg');
+        const para = document.querySelector('.para');
+        
+        para.textContent = `${msg}`
+        div.appendChild(para);
+    }
+
     function gameRestart(){
+        currentPlayer = 0;
+        gameOver = false
         spaces.fill("");
         document.querySelectorAll(`.cell`).forEach((cell) => {
             cell.textContent = "";
