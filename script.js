@@ -77,6 +77,12 @@ const Game = (() => {
             return;
         }
 
+        if(para1.textContent >= 5 || para2.textContent >=5 ){
+            para1.textContent = 0;
+            para2.textContent = 0;
+            Game.gameRestart();
+        }
+
     }
 
     const switchPlayerTurn = () => {
@@ -176,15 +182,19 @@ const Game = (() => {
         })
     }
 
-
+    
     function reStart() {
+        const para1 = document.querySelector('.X_score');
+        const para2 = document.querySelector('.O_score');
         const div = document.querySelector('#gamePanel')
+        spaces.fill("");
+        gameOver = false;
+        called = false;
+        para1.textContent = 0;
+        para2.textContent = 0;
+        currentPlayer = 0;
         document.querySelectorAll('.cell').forEach((btn) => {
             div.removeChild(btn);
-            called = false;
-            currentPlayer = 0;
-            gameOver = false;
-            spaces.fill("");
         });
     }
 
