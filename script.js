@@ -25,17 +25,43 @@ const gameBoard = (() => {
     const div = document.querySelector('#gamePanel');
     
     function render(index) {
-        const btn = document.createElement('button');
-        btn.classList.add('cell');
-        btn.setAttribute('id',`cell-${index}`);
-        div.appendChild(btn);
-        
+        const select = document.querySelector('#playerSelect').value;
+        if(select == 'player'){
+            const btn = document.createElement('button');
+            btn.classList.add('cell');
+            btn.setAttribute('id',`cell-${index}`);
+            div.appendChild(btn);
         
         //hover
-        let buttons = document.querySelectorAll('.cell');
-            buttons.forEach((btn)=>{
-                btn.addEventListener('click', Game.handleClick);
+            let buttons = document.querySelectorAll('.cell');
+                buttons.forEach((btn)=>{
+                    btn.addEventListener('click', Game.handleClick);
             })
+        }else if(select == 'minmaxbot'){
+            const btn = document.createElement('button');
+            btn.classList.add('cell');
+            btn.setAttribute('id',`cell-${index}`);
+            div.appendChild(btn);
+        
+        //hover
+            let buttons = document.querySelectorAll('.cell');
+                buttons.forEach((btn)=>{
+                    btn.addEventListener('click', Game.minmaxbot);
+            })
+        }
+        else{
+            const btn = document.createElement('button');
+            btn.classList.add('cell');
+            btn.setAttribute('id',`cell-${index}`);
+            div.appendChild(btn);
+        
+        //hover
+            let buttons = document.querySelectorAll('.cell');
+                buttons.forEach((btn)=>{
+                    btn.addEventListener('click', Game.botClick);
+            })
+        }
+        
     } 
 
     return { 
@@ -107,6 +133,41 @@ const Game = (() => {
             return event.target.innerText === "";
         }
     }
+
+    function botClick(event) {
+        if(gameOver) {return}
+        let indexArr = event.target.id.split('-')[1];
+
+        let index= event.target.id;
+        if(btnHasText()){
+            document.querySelector(`#${index}`).classList.add('active')
+            document.querySelector(`#${index}`).textContent = players[currentPlayer].mark;
+            spaces[indexArr] = players[currentPlayer].mark;
+            randomAddValue();
+            checkWinner();
+            // switchPlayerTurn();
+        }else {
+            return;
+        }
+        function btnHasText() {
+            return event.target.innerText === "";
+        }
+
+        function randomAddValue() {
+            if(spaces.length == 0){
+                return;
+            }
+
+            const randomNumber = Math.floor(Math.random() * spaces.length -1);
+            if(spaces[randomNumber] == "X"){
+                randomAddValue();
+            }else{
+                spaces[randomNumber] == "O";
+                document.querySelector(`#cell-${randomNumber}`).textContent = "O"; 
+            }
+        }
+    }
+
     function checkWinner(){
         const winningCombos = [
             [0,1,2],
@@ -138,6 +199,7 @@ const Game = (() => {
 
             if(cellsFull){
                 appendMsg("TIE");
+                gameOver = true;
             }
         }
 
@@ -198,10 +260,16 @@ const Game = (() => {
         });
     }
 
+    function minmaxbot() {
+        
+    }
+
 
     return {
         start,
         handleClick,
+        botClick,
+        minmaxbot,
         gameRestart,
         reStart,
     }
