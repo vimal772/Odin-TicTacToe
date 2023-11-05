@@ -26,35 +26,24 @@ const gameBoard = (() => {
     
     function render(index) {
         const select = document.querySelector('#playerSelect').value;
-        if(select == 'player'){
-            const btn = document.createElement('button');
-            btn.classList.add('cell');
-            btn.setAttribute('id',`cell-${index}`);
-            div.appendChild(btn);
-        
+        const btn = document.createElement('button');
+        btn.classList.add('cell');
+        btn.setAttribute('id',`cell-${index}`);
+        div.appendChild(btn);
+        if(select == 'player'){     
         //hover
             let buttons = document.querySelectorAll('.cell');
                 buttons.forEach((btn)=>{
                     btn.addEventListener('click', Game.handleClick);
             })
-        }else if(select == 'minmaxbot'){
-            const btn = document.createElement('button');
-            btn.classList.add('cell');
-            btn.setAttribute('id',`cell-${index}`);
-            div.appendChild(btn);
-        
+        }else if(select == 'minmaxbot'){     
         //hover
             let buttons = document.querySelectorAll('.cell');
                 buttons.forEach((btn)=>{
-                    btn.addEventListener('click', Game.minmaxbot);
+                    btn.addEventListener('click', Game.decideMove);
             })
         }
-        else{
-            const btn = document.createElement('button');
-            btn.classList.add('cell');
-            btn.setAttribute('id',`cell-${index}`);
-            div.appendChild(btn);
-        
+        else{     
         //hover
             let buttons = document.querySelectorAll('.cell');
                 buttons.forEach((btn)=>{
@@ -158,9 +147,12 @@ const Game = (() => {
                 return;
             }
 
-            const randomNumber = Math.floor(Math.random() * spaces.length -1);
+            function createRandomNumber() {
+               return Math.floor(Math.random() * spaces.length -1);
+            }
+            const randomNumber = createRandomNumber();
             if(spaces[randomNumber] == "X"){
-                randomAddValue();
+                createRandomNumber();
             }else{
                 spaces[randomNumber] == "O";
                 document.querySelector(`#cell-${randomNumber}`).textContent = "O"; 
@@ -260,16 +252,80 @@ const Game = (() => {
         });
     }
 
-    function minmaxbot() {
-        
-    }
+    function minmaxbot(spaces, depth, isMaximizing) {
+        if (gameOver) {
+          if (isMaximizing) {
+            return -1;
+          } else {
+            return 1;
+          }
+        }
+      
+        if (isMaximizing) {
+          let bestScore = -Infinity;
+      
+          for (let i = 0; i < spaces.length; i++) {
+            if (spaces[i] === "") {
+              spaces[i] = "O";
+              let score = minmaxbot(spaces, depth + 1, false);
+              spaces[i] = ""; // Undo the move
+              bestScore = Math.max(score, bestScore);
+            }
+          }
+          return bestScore;
+        } else {
+          let bestScore = Infinity;
+      
+          for (let i = 0; i < spaces.length; i++) {
+            if (spaces[i] === "") {
+              spaces[i] = "X";
+              let score = minmaxbot(spaces, depth + 1, true);
+              spaces[i] = ""; // Undo the move
+              bestScore = Math.min(score, bestScore);
+            }
+          }
+          return bestScore;
+        }
+      }
+      
+      function makeBestMove() {
+        let bestScore = -Infinity;
+        let move;
+      
+        for (let i = 0; i < spaces.length; i++) {
+          if (spaces[i] === "") {
+            spaces[i] = "O";
+            let score = minmaxbot(spaces, 0, true);
+            spaces[i] = ""; // Undo the move
+            if (score > bestScore) {
+              bestScore = score;
+              move = i;
+            }
+          }
+        }
+        spaces[move] = "O";
+        // Update the UI here to reflect the bot's move
+        const cellId = `cell-${move}`;
+        document.getElementById(cellId).textContent = "O";
+      
+        checkWinner(); // Check if the bot has won
+        switchPlayerTurn(); // Switch to the player's turn
+      }
 
+      function decideMove() {
+        if(players[currentPlayer].mark == "X"){
+            handleClick(event);
+        }else {
+            makeBestMove()
+        }
+      }
+      
 
     return {
         start,
         handleClick,
         botClick,
-        minmaxbot,
+        decideMove,
         gameRestart,
         reStart,
     }

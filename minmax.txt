@@ -1,0 +1,49 @@
+function minmaxbot(spaces,depth,isMaximizing) {
+        if(gameOver){
+            if(isMaximizing){
+                return -1;
+            }else{
+                return 1;
+            }
+        }
+
+        if(isMaximizing){
+            let bestScore = -Infinity;
+
+            for(let i=0;i<spaces.length;i++){
+                if(spaces[i] == ""){
+                    let score = minmaxbot(spaces,depth+1,false);
+                    bestScore = Math.max(score,bestScore);
+                }
+            }
+            return bestScore;
+        }else{
+            let bestScore = Infinity;
+
+            for(let i=0;i<spaces.length;i++){
+                if(spaces[i] == ""){
+                    let score = minmaxbot(spaces,depth+1,true);
+                    bestScore = Math.min(score,bestScore);
+                }
+            }
+            return bestScore;
+        }
+    }
+
+    function makeBestMove(){
+        let bestScore = -Infinity;
+        let move;
+
+        for(let i=0;i<spaces.length;i++) {
+            if(spaces[i] == "") {
+                let score = minmaxbot(spaces,0,true);
+                if(score>bestScore){
+                    bestScore = score;
+                    move = { i };
+                }
+            }
+        }
+
+        spaces[move.i] = "O";
+        console.log(spaces);
+    }
